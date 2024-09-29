@@ -1,0 +1,76 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Autoformat Code",
+      "type": "shell",
+      "command": "clang-format -i include/soccerbot/* main/src/*",
+      "problemMatcher": []
+    },
+    {
+      "label": "Disable OTA Updates",
+      "type": "shell",
+      "command": "${config:idf.pythonBinPathWin} scripts/support.py ota-disable",
+      "options": {
+        "env": {
+          "PATH": "${env:PATH}:${config:idf.customExtraPaths}",
+          "espPythonPath": "${config:idf.pythonBinPathWin}",
+          "espIdfPath": "${config:idf.espIdfPathWin}"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy OTA Update",
+      "type": "shell",
+      "command": "${config:idf.pythonBinPathWin} scripts/support.py ota",
+      "options": {
+        "env": {
+          "PATH": "${env:PATH}:${config:idf.customExtraPaths}",
+          "espPythonPath": "${config:idf.pythonBinPathWin}",
+          "espIdfPath": "${config:idf.espIdfPathWin}"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Update DNS Entry",
+      "type": "shell",
+      "command": "${config:idf.pythonBinPathWin} scripts/support.py dns",
+      "options": {
+        "env": {
+          "PATH": "${env:PATH}:${config:idf.customExtraPaths}",
+          "espPythonPath": "${config:idf.pythonBinPathWin}",
+          "espIdfPath": "${config:idf.espIdfPathWin}"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy Serial Update",
+      "type": "shell",
+      "command": "${config:idf.pythonBinPathWin} scripts/support.py deploy",
+      "options": {
+        "env": {
+          "PATH": "${env:PATH}:${config:idf.customExtraPaths}",
+          "espPythonPath": "${config:idf.pythonBinPathWin}",
+          "espIdfPath": "${config:idf.espIdfPathWin}"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Admin Interface",
+      "type": "shell",
+      "command": "${config:idf.pythonBinPathWin} scripts/admin.py",
+      "options": {
+        "env": {
+          "PATH": "${env:PATH}:${config:idf.customExtraPaths}",
+          "espPythonPath": "${config:idf.pythonBinPathWin}",
+          "espIdfPath": "${config:idf.espIdfPathWin}"
+        }
+      },
+      "problemMatcher": []
+    }
+  ]
+}
