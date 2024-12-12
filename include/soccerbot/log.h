@@ -4,6 +4,7 @@
 #include <freertos/FreeRTOS.h> // Mandatory first include
 
 #include <cstdio>
+#include <string_view>
 
 #include <esp_err.h>
 #include <esp_log.h>
@@ -62,6 +63,14 @@ inline void checkImpl(esp_err_t val, const char* file, int line)
     }
 
 #define FAIL() (checkImpl(nullptr, __FILE__, __LINE__))
+
+#define MAX_LOG_SIZE 1000
+using LogSinkFun = void(*)(std::string_view str);
+void addLogSink(LogSinkFun fun);
+void removelogSink(LogSinkFun fun);
+
+// Enable custom loggers by replacing built-in function
+void overrideLog();
 
 }; // namespace soccerbot
 

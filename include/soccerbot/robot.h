@@ -2,7 +2,6 @@
 #define SOCCERBOT_ROBOT_H
 
 #include <array>
-#include <semaphore>
 #include <optional>
 
 #include <esp_flash_partitions.h>
@@ -18,55 +17,39 @@
 #include <soccerbot/lightSensor.h>
 #include <soccerbot/motor.h>
 #include <soccerbot/net.h>
+#include <soccerbot/desc.h>
+#include <soccerbot/log.h>
 
 namespace soccerbot {
+
+// Check if the latest OTA update has been verified
+bool isOtaUpdateVerified();
+
 // Put the robot in a known state
-inline void setGpioOff()
-{
-    #ifdef OTA_ENABLED
-    esp_ota_img_states_t state;
-
-    CHECK(esp_ota_get_state_partition(esp_ota_get_running_partition(), &state));
-
-    if (state == ESP_OTA_IMG_PENDING_VERIFY) {
-        // Don't do potentially dangerous GPIO while testing a new update
-        return;
-    }
-    #endif
-
-    gpio_set_level(PINCONFIG(MOTOR_A_PIN1), 0);
-    gpio_set_level(PINCONFIG(MOTOR_A_PIN2), 0);
-    gpio_set_level(PINCONFIG(MOTOR_B_PIN1), 0);
-    gpio_set_level(PINCONFIG(MOTOR_B_PIN2), 0);
-
-    gpio_set_level(PINCONFIG(PHOTODIODE_FRONT_LEFT), 0);
-    gpio_set_level(PINCONFIG(PHOTODIODE_FRONT_RIGHT), 0);
-    gpio_set_level(PINCONFIG(PHOTODIODE_BACK_LEFT), 0);
-    gpio_set_level(PINCONFIG(PHOTODIODE_BACK_RIGHT), 0);
-}
+void setGpioOff();
 
 // Emergency shutdown handler
-inline void safetyShutdown() {
-    setGpioOff();
-}
+void safetyShutdown();
+
+void robotLogSink(std::string_view str);
 
 // The state of a soccer bot
 class Robot {
 public:
-    enum NOTIFY {
-        ROBOT_NOTIFY_DNS
-    };
-
+    // Onboard button marked 0 on the S2 Mini
     Button button0;
 
-    Motor left;
-    Motor right;
+    MOTOR_TYPE left;
+    MOTOR_TYPE right;
 
     DifferentialKinematics kinematics;
 
     LightSensor frontLeft, frontRight, backLeft, backRight;
 
+    // Outbound client to centralized server, if applicable
     TcpClient* client;
+
+    // Task handling robot net sockets and commands
     TaskHandle_t task;
 
     Robot()
@@ -79,21 +62,26 @@ public:
         , backLeft(PINCONFIG(PHOTODIODE_BACK_LEFT))
         , backRight(PINCONFIG(PHOTODIODE_BACK_RIGHT))
     {
+        // Shut down robot hardware when esp_restart() is called
         esp_register_shutdown_handler(safetyShutdown);
 
-        ESP_LOGI("", "p1");
+        //overrideLog();
+        //addLogSink(robotLogSink);
+
+        // Start task that polls robot net sockets and acts on their commands
         runThread();
 
-        ESP_LOGI("", "p2");
+        connectToServer();
+    }
+
+    void connectToServer() {
         auto ip = getServerIp();
 
         if (ip) {
             uint16_t port = 3001;
 
             client = addTcpClient(ip->u_addr.ip4.addr, port);
-            ESP_LOGI("", "p3");
             client->waitToConnect();
-            ESP_LOGI("", "p4");
             client->sendHello();
 
             ESP_LOGI("", "Sent HELLO to server");
@@ -105,6 +93,12 @@ public:
 
     std::optional<ip_addr_t> getServerIp()
     {
+#ifdef FIXED_SERVER_IP
+        ip_addr_t addr = {};
+        ip4addr_aton(FIXED_SERVER_IP, &addr.u_addr.ip4);
+        addr.type = IPADDR_TYPE_V4;
+        return addr;
+#else
         auto domain = "soccer-server.internal";
 
         addrinfo* serverAddr;
@@ -123,10 +117,11 @@ public:
         freeaddrinfo(serverAddr);
 
         in_addr ip = ((sockaddr_in*)serverAddr->ai_addr)->sin_addr;
-        ip_addr_t structure;
-        structure.u_addr.ip4.addr = ip.s_addr;
-        structure.type = IPADDR_TYPE_V4;
-        return structure;
+        ip_addr_t addr = {};
+        addr.u_addr.ip4.addr = ip.s_addr;
+        addr.type = IPADDR_TYPE_V4;
+        return addr;
+#endif
     }
 
     void tick(uint64_t us)
@@ -164,6 +159,9 @@ public:
 
     void runThread();
 };
+
+extern std::optional<Robot> robot;
+
 }; // namespace soccerbot
 
 #endif // ifndef SOCCERBOT_ROBOT_H

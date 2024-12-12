@@ -6,6 +6,7 @@
 #include <pid_ctrl.h>
 
 #include <soccerbot/motor.h>
+#include <soccerbot/desc.h>
 
 namespace soccerbot {
 struct FVec2 {
@@ -28,20 +29,20 @@ private:
     pid_ctrl_block_handle_t leftPid;
     pid_ctrl_config_t leftConfig = {};
 
-    Motor* leftMotor;
+    MOTOR_TYPE* leftMotor;
     float leftTarget = 0.0;
 
     pid_ctrl_block_handle_t rightPid;
     pid_ctrl_config_t rightConfig = {};
 
-    Motor* rightMotor;
+    MOTOR_TYPE* rightMotor;
     float rightTarget = 0.0;
 
     Pose2d location = {};
     Pose2d target = {};
 
 public:
-    DifferentialKinematics(Motor& leftMotor_, Motor& rightMotor_);
+    DifferentialKinematics(MOTOR_TYPE& leftMotor_, MOTOR_TYPE& rightMotor_);
 
     void tick(uint32_t delta);
 

@@ -20,13 +20,12 @@ enum class StateKey : uint32_t {
     STATE_COUNT
 };
 
-extern uint32_t stateStore[(size_t)StateKey::CONFIG_COUNT];
+extern uint32_t stateStore[(size_t)StateKey::STATE_COUNT];
 
 struct StateSubscription {
     TickType_t interval;
     StateKey offset;
 }
-
 
 }; // namespace soccerbot
 

@@ -47,7 +47,7 @@ struct TaskStackSize {
     static constexpr configSTACK_DEPTH_TYPE SMALL = configMINIMAL_STACK_SIZE;
 
     // Anything should be fine
-    static constexpr configSTACK_DEPTH_TYPE LARGE = CONFIG_TINYUSB_TASK_STACK_SIZE;
+    static constexpr configSTACK_DEPTH_TYPE LARGE = CONFIG_TINYUSB_TASK_STACK_SIZE * 2;
 };
 
 

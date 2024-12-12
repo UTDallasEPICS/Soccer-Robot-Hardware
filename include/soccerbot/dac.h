@@ -11,7 +11,13 @@ namespace soccerbot {
 // Works on any GPIO pin through LEDC
 class PwmPin {
 public:
-    constexpr static ledc_timer_bit_t LEDC_DUTY_RES = LEDC_TIMER_14_BIT; //LEDC_TIMER_13_BIT;
+    #if MOTOR_TYPE == MotorDesc 
+    constexpr static ledc_timer_bit_t LEDC_DUTY_RES = LEDC_TIMER_13_BIT;
+    constexpr static uint32_t  LEDC_FREQ_HZ = 100; // Set output frequency at 5kHz
+    #else
+    constexpr static ledc_timer_bit_t LEDC_DUTY_RES = LEDC_TIMER_14_BIT;
+    constexpr static uint32_t  LEDC_FREQ_HZ = 5000; // Set output frequency at 5kHz
+    #endif
 
     // The ESP32-S2 only supports low speed mode (software emulation)
     constexpr static ledc_mode_t LEDC_MODE = LEDC_LOW_SPEED_MODE;

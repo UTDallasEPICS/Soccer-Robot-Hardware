@@ -44,13 +44,13 @@ enum class ConfigKey : uint32_t {
 
 extern uint32_t configStore[(size_t)ConfigKey::CONFIG_COUNT];
 
-template <typename ValT = uint32_t>
-ValT getConfig(ConfigKey key)
+template <typename ValT>
+ValT& getConfig(ConfigKey key)
 {
     CHECK(key < ConfigKey::CONFIG_COUNT);
     int32_t ikey = (int32_t)key;
 
-    return bitcast<ValT>(configStore[ikey]);
+    return *(ValT*)&configStore[ikey];
 }
 
 template <typename ValT = uint32_t>

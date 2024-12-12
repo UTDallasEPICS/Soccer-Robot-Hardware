@@ -21,7 +21,7 @@ PwmPin::PwmPin(gpio_num_t pin)
         timerConfig.speed_mode = LEDC_MODE;
         timerConfig.timer_num = LedcMapping::PWM;
         timerConfig.duty_resolution = LEDC_DUTY_RES;
-        timerConfig.freq_hz = 50; //476 * 2; //5000; // Set output frequency at 5 kHz
+        timerConfig.freq_hz = LEDC_FREQ_HZ;
         timerConfig.clk_cfg = LEDC_AUTO_CLK;
         CHECK(ledc_timer_config(&timerConfig));
     }

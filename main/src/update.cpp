@@ -156,7 +156,7 @@ void doUpdateUpgrade()
         return;
     }
 
-    if (otaJson.containsKey("disabled")) {
+    if (otaJson["disabled"].is<bool>() && otaJson["disabled"].as<bool>()) {
         ESP_LOGI(TAG, "Firmware upgrade disabled");
         xEventGroupSetBits(otaEvents, FIRST_OTA_CHECK_DONE);
         return;

@@ -88,7 +88,9 @@ inline float fmap(float val, float inMin, float inMax, float outMin, float outMa
     return map<float>(val, inMin, inMax, outMin, outMax);
 }
 
-//#define OTA_ENABLED
+#ifndef MOTOR_TYPE
+    #define MOTOR_TYPE MotorPwm
+#endif
 
 }; // namespace soccerbot
 
